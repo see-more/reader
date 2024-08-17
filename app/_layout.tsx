@@ -1,6 +1,8 @@
 import { Stack } from 'expo-router';
 import React from 'react';
-import { Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import SearchIcon from '../components/SearchIcon';
+import AddIcon from '../components/AddIcon';
 const Layout = () => {
   return (
     <Stack>
@@ -10,8 +12,16 @@ const Layout = () => {
           navigationBarHidden: true,
           statusBarHidden: true,
           headerShadowVisible: false,
-          headerTitle: (props) => {
+          headerTitle: () => {
             return <Text>正在阅读</Text>;
+          },
+          headerRight: () => {
+            return (
+              <View style={styles.icnoLine}>
+                <SearchIcon />
+                <AddIcon />
+              </View>
+            );
           },
         }}
       />
@@ -26,5 +36,15 @@ const Layout = () => {
     </Stack>
   );
 };
+
+const styles = StyleSheet.create({
+  icnoLine: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'row',
+    gap: 15,
+  },
+});
 
 export default Layout;
