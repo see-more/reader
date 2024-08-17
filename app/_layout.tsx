@@ -1,9 +1,25 @@
 import { Stack } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import SearchIcon from '../components/SearchIcon';
 import AddIcon from '../components/AddIcon';
+import * as FileSystem from 'expo-file-system';
+import useBookStore from '../stores/BookStore';
 const Layout = () => {
+  const { addAllBooks } = useBookStore();
+  useEffect(() => {
+    const readAllBooks = async () => {
+      if (FileSystem.documentDirectory === null) {
+        return;
+      }
+      const data = await FileSystem.readDirectoryAsync(
+        FileSystem.documentDirectory
+      );
+      const books = data.filter((item) => item.endsWith('.txt'));
+      addAllBooks(books);
+    };
+    readAllBooks();
+  }, []);
   return (
     <Stack>
       <Stack.Screen
