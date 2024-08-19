@@ -10,7 +10,16 @@ export interface Point {
   pos: SkPoint;
 }
 type Points = Point[];
-
+/**
+ * 计算书籍的排版点
+ * @param book 书籍对象，包含章节内容
+ * @param getGlyphIDs 根据字符串和字码点数获取字形ID的函数
+ * @param maxChar 每行最大字符数
+ * @param maxLines 每页最大行数
+ * @param fontSize 字体大小
+ * @param top 顶部偏移量
+ * @returns 书籍的排版点数组
+ */
 export const caculateBook = (
   book: Book,
   getGlyphIDs: (str: string, numCodePoints?: number) => number[],
