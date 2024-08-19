@@ -11,7 +11,7 @@ export const useBook = ({
   font,
 }: {
   bookName: string;
-  font: SkFont;
+  font: SkFont | null;
 }): {
   glyphs: Array<bookPoints>;
   currentPage: number;
@@ -41,10 +41,9 @@ export const useBook = ({
   const maxLines = Math.floor((height - top) / fontSize);
   const maxChar = Math.floor(width / fontSize);
 
-  const { getGlyphIDs } = font;
   const glyphs = caculateBook(
     book!,
-    getGlyphIDs,
+    font,
     maxChar,
     maxLines,
     fontSize,

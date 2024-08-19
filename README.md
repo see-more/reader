@@ -8,5 +8,5 @@
 - [ ] Add chacpter list component
 - [ ] Add search
 - [ ] Sotre book data in local storage
-- [ ] CaculateBookPage function optimize performance
+- [x] CaculateBookPage function optimize performance
 - [ ] Add gestrure controller to change page
