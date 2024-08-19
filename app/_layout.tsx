@@ -25,8 +25,6 @@ const Layout = () => {
       <Stack.Screen
         name='index'
         options={{
-          navigationBarHidden: true,
-          statusBarHidden: true,
           headerShadowVisible: false,
           headerTitle: () => {
             return <Text>正在阅读</Text>;
@@ -43,8 +41,6 @@ const Layout = () => {
       />
       <Stack.Screen
         options={{
-          statusBarHidden: true,
-          navigationBarHidden: true,
           headerShown: false,
         }}
         name='book/[book]'

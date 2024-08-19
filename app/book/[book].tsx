@@ -33,7 +33,7 @@ const BookReader = () => {
     };
     readFile();
   }, []);
-  const fontSize = 25;
+  const fontSize = 22;
   const maxLines = Math.floor((height - top) / fontSize);
   const maxChar = Math.floor(width / fontSize);
   const font = useFont(

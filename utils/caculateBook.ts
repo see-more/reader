@@ -54,6 +54,9 @@ export const caculateBook = (
     for (let paragraph = 0; paragraph < currentContent.length; paragraph++) {
       const currentParagraph = currentContent[paragraph].trim();
       font?.getGlyphIDs(currentParagraph).forEach((id, index) => {
+        if (id === 0) {
+          return;
+        }
         if (cursor.getColumn() < maxChar - 1) {
           if (cursor.getLine() < maxLines) {
             currentPoints.push({
