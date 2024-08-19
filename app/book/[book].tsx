@@ -18,6 +18,8 @@ const BookReader = () => {
   const [book, setBook] = useState<Book | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [currentChacpter, setCurrentchapter] = useState(0);
+  const { width, height } = useWindowDimensions();
+  const { top } = useSafeAreaInsets();
   useEffect(() => {
     const readFile = async () => {
       try {
@@ -32,8 +34,6 @@ const BookReader = () => {
     readFile();
   }, []);
   const fontSize = 25;
-  const { width, height } = useWindowDimensions();
-  const { top } = useSafeAreaInsets();
   const maxLines = Math.floor((height - top) / fontSize);
   const maxChar = Math.floor(width / fontSize);
   const font = useFont(
@@ -74,16 +74,18 @@ const BookReader = () => {
             <Button
               title='上一页'
               onPress={() => {
-                if (currentPage != 0) {
-                  setCurrentPage((currentPage) => currentPage - 1);
-                } else {
-                  if (currentChacpter === 0) {
+                if (glyphs.length != 0) {
+                  if (currentChacpter === 0 && currentPage === 0) {
                     return;
-                  } else {
+                  }
+                  if (currentPage === 0) {
+                    const preChacpter = currentChacpter - 1;
                     setCurrentchapter((currentChacpter) => currentChacpter - 1);
                     setCurrentPage(
-                      glyphs[currentChacpter].allchacpterPoints.length
+                      glyphs[preChacpter].allchacpterPoints.length - 1
                     );
+                  } else {
+                    setCurrentPage(currentPage - 1);
                   }
                 }
               }}
@@ -98,28 +100,35 @@ const BookReader = () => {
               title='下一页'
               onPress={() => {
                 if (
-                  currentPage <
+                  currentChacpter === glyphs.length - 1 &&
+                  currentPage ===
+                    glyphs[currentChacpter].allchacpterPoints.length - 1
+                ) {
+                  return;
+                }
+                if (
+                  currentPage ===
                   glyphs[currentChacpter].allchacpterPoints.length - 1
                 ) {
-                  setCurrentPage((currentPage) => currentPage + 1);
+                  setCurrentPage(0);
+                  setCurrentchapter(currentChacpter + 1);
                 } else {
-                  if (currentChacpter < glyphs.length - 1) {
-                    setCurrentPage(0);
-                    setCurrentchapter((currentChacpter) => currentChacpter + 1);
-                  } else {
-                    return;
-                  }
+                  setCurrentPage(currentPage + 1);
                 }
               }}
             />
           </View>
         </>
       ) : (
-        <AntDesign
-          name='loading1'
-          size={24}
-          color='black'
-        />
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <AntDesign
+            name='loading1'
+            size={24}
+            color='black'
+          />
+        </View>
       )}
     </SafeAreaView>
   );
