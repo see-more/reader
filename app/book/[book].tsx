@@ -1,10 +1,4 @@
-import {
-  Button,
-  SafeAreaView,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { SafeAreaView, useWindowDimensions, View } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { Book } from '../../models/Book';
 import { useLocalSearchParams } from 'expo-router';
@@ -45,13 +39,16 @@ const BookReader = () => {
       maxChar,
       maxLines,
       fontSize,
-      top ? top : 30
+      top ? top * 2 : 30
     );
   }, [book, font]);
   return (
     <SafeAreaView
       style={{ flex: 1 }}
       onTouchEnd={({ nativeEvent }) => {
+        if (!glyphs || glyphs.length === 0) {
+          return;
+        }
         if (nativeEvent.pageX < width * (3 / 8)) {
           if (glyphs.length != 0) {
             if (currentChacpter === 0 && currentPage === 0) {
