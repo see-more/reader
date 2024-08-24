@@ -13,6 +13,7 @@ export class Book {
       /[第章回部节集卷] *[\d一二三四五六七八九十零〇百千两]+ *[第章回部节集卷]( |、)/g;
     const match = content.match(pattern);
     if (match === null) {
+      this.#bookChapters.push(new BookChapter(content));
     } else {
       for (let index = 1; index <= match.length; index++) {
         const element = match[index];

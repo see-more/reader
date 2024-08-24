@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { caculateBook } from '../../utils/caculateBook';
 import AntDesign from '@expo/vector-icons/AntDesign';
 const BookReader = () => {
-  const { bookName } = useLocalSearchParams<{ bookName: string }>();
+  const { uri } = useLocalSearchParams<{ uri: string }>();
   const [book, setBook] = useState<Book | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [currentChacpter, setCurrentchapter] = useState(0);
@@ -23,9 +23,7 @@ const BookReader = () => {
   useEffect(() => {
     const readFile = async () => {
       try {
-        const fileContent = await FileSystem.readAsStringAsync(
-          FileSystem.documentDirectory + bookName
-        );
+        const fileContent = await FileSystem.readAsStringAsync(uri);
         setBook(new Book(fileContent));
       } catch (err) {
         console.error(err);
@@ -51,7 +49,41 @@ const BookReader = () => {
     );
   }, [book, font]);
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView
+      style={{ flex: 1 }}
+      onTouchEnd={({ nativeEvent }) => {
+        if (nativeEvent.pageX < width * (3 / 8)) {
+          if (glyphs.length != 0) {
+            if (currentChacpter === 0 && currentPage === 0) {
+              return;
+            }
+            if (currentPage === 0) {
+              const preChacpter = currentChacpter - 1;
+              setCurrentchapter((currentChacpter) => currentChacpter - 1);
+              setCurrentPage(glyphs[preChacpter].allchacpterPoints.length - 1);
+            } else {
+              setCurrentPage(currentPage - 1);
+            }
+          }
+        } else if (nativeEvent.pageX > width * (5 / 8)) {
+          if (
+            currentChacpter === glyphs.length - 1 &&
+            currentPage === glyphs[currentChacpter].allchacpterPoints.length - 1
+          ) {
+            return;
+          }
+          if (
+            currentPage ===
+            glyphs[currentChacpter].allchacpterPoints.length - 1
+          ) {
+            setCurrentPage(0);
+            setCurrentchapter(currentChacpter + 1);
+          } else {
+            setCurrentPage(currentPage + 1);
+          }
+        }
+      }}
+    >
       {glyphs && glyphs.length ? (
         <>
           <Canvas style={{ flex: 1 }}>
@@ -60,7 +92,7 @@ const BookReader = () => {
               glyphs={glyphs[currentChacpter].allchacpterPoints[currentPage]}
             />
           </Canvas>
-          <View
+          {/* <View
             style={{
               display: 'flex',
               flexDirection: 'row',
@@ -117,7 +149,7 @@ const BookReader = () => {
                 }
               }}
             />
-          </View>
+          </View> */}
         </>
       ) : (
         <View

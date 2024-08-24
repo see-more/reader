@@ -1,20 +1,30 @@
 import { create } from 'zustand';
-
+import { type DocumentPickerAsset } from 'expo-document-picker';
+import { Book } from '../models/Book';
 interface BookstoreState {
-  books: string[];
-  addBook: (bookName: string) => void;
-  removeBook: (bookName: string) => void;
-  addAllBooks: (books: string[]) => void;
+  books: DocumentPickerAsset[];
+  addBook: (bookName: DocumentPickerAsset) => void;
+  removeBook: (bookName: DocumentPickerAsset) => void;
+  addAllBooks: (books: DocumentPickerAsset[]) => void;
 }
 
 const useBookStore = create<BookstoreState>((set) => ({
   books: [],
-  addBook: (bookName) =>
-    set((state) => ({ books: [...state.books, bookName] })),
-  removeBook: (bookName) =>
-    set((state) => ({ books: state.books.filter((b) => b !== bookName) })),
-  addAllBooks: (books) =>
-    set((state) => ({ books: [...state.books, ...books] })),
+  addBook: (currentBook: DocumentPickerAsset) => {
+    set((state) => ({
+      books: [...state.books, currentBook],
+    }));
+  },
+  addAllBooks: (books: DocumentPickerAsset[]) => {
+    set((state) => ({
+      books: [...state.books, ...books],
+    }));
+  },
+  removeBook: (currentBook: DocumentPickerAsset) => {
+    set((state) => ({
+      books: state.books.filter((book) => book.uri !== currentBook.uri),
+    }));
+  },
 }));
 
 export default useBookStore;

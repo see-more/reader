@@ -10,10 +10,21 @@ import {
 import useBookStore from '../stores/BookStore';
 import BookCover from '../components/BookCover';
 import { router } from 'expo-router';
-
+import { useEffect } from 'react';
+import { useBookConfigStore } from '../stores/GlobConfigStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export default function Index() {
   const { height, width } = useWindowDimensions();
+  const { top } = useSafeAreaInsets();
   const { books } = useBookStore();
+  const { setFontSize, setMaxChar, setMaxLines, setTop, config } =
+    useBookConfigStore();
+  useEffect(() => {
+    setFontSize(25);
+    setMaxChar(Math.floor(width / config.fontSize));
+    setMaxLines(Math.floor((height - top) / config.fontSize));
+    setTop(top);
+  }, []);
   return (
     <View style={styles.container}>
       {books.length ? (
@@ -28,7 +39,7 @@ export default function Index() {
                   router.push({
                     pathname: 'book/[book]',
                     params: {
-                      bookName: item,
+                      uri: item.uri,
                     },
                   })
                 }
@@ -37,13 +48,13 @@ export default function Index() {
                 <BookCover
                   height={height}
                   width={width}
-                  bookname={item.split('.')[0]}
+                  bookname={item.name.split('.')[0]}
                 />
               </Pressable>
             );
           }}
           keyExtractor={(item) => {
-            return item;
+            return item.name;
           }}
         />
       ) : (
