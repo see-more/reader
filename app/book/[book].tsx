@@ -29,8 +29,8 @@ const BookReader = () => {
   const maxLines = Math.floor((height - top) / fontSize);
   const maxChar = Math.floor(width / fontSize);
   const font = useFont(
-    require('../../assets/fonts/FangZhengYouHeiJianTi-1.ttf'),
-    fontSize
+    require('@/assets/fonts/FangZhengYouHeiJianTi-1.ttf'),
+    fontSize,
   );
   const glyphs = useMemo(() => {
     return caculateBook(
@@ -39,7 +39,7 @@ const BookReader = () => {
       maxChar,
       maxLines,
       fontSize,
-      top ? top * 2 : 30
+      top ? top * 2 : 30,
     );
   }, [book, font]);
   return (
@@ -152,11 +152,7 @@ const BookReader = () => {
         <View
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
-          <AntDesign
-            name='loading1'
-            size={24}
-            color='black'
-          />
+          <AntDesign name="loading1" size={24} color="black" />
         </View>
       )}
     </SafeAreaView>

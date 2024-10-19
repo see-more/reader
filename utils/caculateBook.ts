@@ -26,7 +26,7 @@ export const caculateBook = (
   maxChar: number,
   maxLines: number,
   fontSize: number,
-  top: number
+  top: number,
 ): Array<bookPoints> => {
   if (font === null) {
     return [];
@@ -43,7 +43,7 @@ export const caculateBook = (
         id,
         pos: vec(
           cursor.getColumn() * fontSize,
-          top + cursor.getLine() * fontSize
+          top + cursor.getLine() * fontSize,
         ),
       });
       cursor.nextChar();
@@ -63,7 +63,7 @@ export const caculateBook = (
               id,
               pos: vec(
                 cursor.getColumn() * fontSize,
-                top + cursor.getLine() * fontSize
+                top + cursor.getLine() * fontSize,
               ),
             });
             cursor.nextChar();
@@ -75,7 +75,7 @@ export const caculateBook = (
               id,
               pos: vec(
                 cursor.getColumn() * fontSize,
-                top + cursor.getLine() * fontSize
+                top + cursor.getLine() * fontSize,
               ),
             });
             cursor.nextChar();
@@ -86,7 +86,7 @@ export const caculateBook = (
               id,
               pos: vec(
                 cursor.getColumn() * fontSize,
-                top + cursor.getLine() * fontSize
+                top + cursor.getLine() * fontSize,
               ),
             });
             cursor.nextLine();
@@ -98,7 +98,7 @@ export const caculateBook = (
               id,
               pos: vec(
                 cursor.getColumn() * fontSize,
-                top + cursor.getLine() * fontSize
+                top + cursor.getLine() * fontSize,
               ),
             });
             cursor.nextChar();

@@ -26,7 +26,7 @@ export const useBook = ({
     const readFile = async () => {
       try {
         const fileContent = await FileSystem.readAsStringAsync(
-          FileSystem.documentDirectory + bookName
+          FileSystem.documentDirectory + bookName,
         );
         setBook(new Book(fileContent));
       } catch (err) {
@@ -47,7 +47,7 @@ export const useBook = ({
     maxChar,
     maxLines,
     fontSize,
-    top ? top : 30
+    top ? top : 30,
   );
   return {
     glyphs,

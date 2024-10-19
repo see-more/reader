@@ -8,11 +8,14 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prettier:check": "prettier --check .",
+    "prettier:write": "prettier --write ."
   },
   "dependencies": {
     "@shopify/flash-list": "1.6.4",
     "@shopify/react-native-skia": "1.2.3",
+    "eslint-config-prettier": "^9.1.0",
     "expo": "~51.0.31",
     "expo-constants": "~16.0.2",
     "expo-document-picker": "~12.0.2",
@@ -28,9 +31,17 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@eslint/js": "^9.13.0",
     "@expo/ngrok": "4.1.0",
+    "@react-native/eslint-config": "^0.75.4",
     "@types/react": "~18.2.45",
-    "typescript": "^5.3.3"
+    "@types/react-native": "^0.73.0",
+    "eslint": "^9.13.0",
+    "eslint-plugin-react": "^7.37.1",
+    "globals": "^15.11.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.10.0"
   },
   "private": true
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Text, View, GestureResponderEvent } from 'react-native';
-import * as FileSystem from 'expo-file-system';
 const BookCover = ({
   height,
   width,

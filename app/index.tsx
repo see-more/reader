@@ -60,7 +60,7 @@ export default function Index() {
       ) : (
         <Text style={styles.emptyContainer}>这里空空如也</Text>
       )}
-      <StatusBar style='auto' />
+      <StatusBar style="auto" />
     </View>
   );
 }

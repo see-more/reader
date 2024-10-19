@@ -7,7 +7,7 @@ const Layout = () => {
   return (
     <Stack>
       <Stack.Screen
-        name='index'
+        name="index"
         options={{
           headerShadowVisible: false,
           headerTitle: () => {
@@ -27,7 +27,7 @@ const Layout = () => {
         options={{
           headerShown: false,
         }}
-        name='book/[book]'
+        name="book/[book]"
       />
     </Stack>
   );

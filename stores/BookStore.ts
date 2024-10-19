@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { type DocumentPickerAsset } from 'expo-document-picker';
-import { Book } from '../models/Book';
 interface BookstoreState {
   books: DocumentPickerAsset[];
   addBook: (bookName: DocumentPickerAsset) => void;

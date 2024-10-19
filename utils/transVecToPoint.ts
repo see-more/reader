@@ -1,7 +1,7 @@
 export const transVecToPoint = (
   vec: number[],
   fontSize: number,
-  top: number
+  top: number,
 ) => {
   const points: number[][] = [];
   for (let i = 0; i < vec.length; i += 2) {
