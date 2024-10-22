@@ -31,10 +31,10 @@ export const caculateBook = (
   if (font === null) {
     return [];
   }
-  let bookPoints: Array<bookPoints> = [];
+  const bookPoints: Array<bookPoints> = [];
   const cursor = new Cursor();
   for (let chacpter = 0; chacpter < book.getBookChapters().length; chacpter++) {
-    let currentChacpterPoints: Points[] = [];
+    const currentChacpterPoints: Points[] = [];
     let currentPoints: Points = [];
     const currentChacpter = book.getBookChapters()[chacpter];
     const title = currentChacpter.getChapterName();
