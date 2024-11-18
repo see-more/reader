@@ -21,6 +21,7 @@
         "backgroundColor": "#ffffff"
       }
     },
+    "newArchEnabled": true,
     "web": {
       "favicon": "./assets/favicon.png"
     },
