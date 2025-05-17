@@ -3,7 +3,7 @@ import { Cursor } from '../models/Cursor';
 import { SkFont, SkPoint, vec } from '@shopify/react-native-skia';
 
 export interface bookPoints {
-  allchacpterPoints: Array<Points>;
+  allchacpterPoints: Points[];
 }
 export interface Point {
   id: number;
@@ -27,11 +27,11 @@ export const caculateBook = (
   maxLines: number,
   fontSize: number,
   top: number,
-): Array<bookPoints> => {
+): bookPoints[] => {
   if (font === null) {
     return [];
   }
-  const bookPoints: Array<bookPoints> = [];
+  const bookPoints: bookPoints[] = [];
   const cursor = new Cursor();
   for (let chacpter = 0; chacpter < book.getBookChapters().length; chacpter++) {
     const currentChacpterPoints: Points[] = [];
