@@ -38,7 +38,7 @@ export const caculateBook = (
     let currentPoints: Points = [];
     const currentChacpter = book.getBookChapters()[chacpter];
     const title = currentChacpter.getChapterName();
-    font?.getGlyphIDs(title).forEach((id) => {
+    font?.getGlyphIDs(title).forEach((id: any) => {
       currentPoints.push({
         id,
         pos: vec(
@@ -53,67 +53,69 @@ export const caculateBook = (
     const currentContent = currentChacpter.getChapterContent();
     for (let paragraph = 0; paragraph < currentContent.length; paragraph++) {
       const currentParagraph = currentContent[paragraph].trim();
-      font?.getGlyphIDs(currentParagraph).forEach((id, index) => {
-        if (id === 0) {
-          return;
-        }
-        if (cursor.getColumn() < maxChar - 1) {
-          if (cursor.getLine() < maxLines) {
-            currentPoints.push({
-              id,
-              pos: vec(
-                cursor.getColumn() * fontSize,
-                top + cursor.getLine() * fontSize,
-              ),
-            });
-            cursor.nextChar();
-          } else {
-            currentChacpterPoints.push(currentPoints);
-            currentPoints = [];
-            cursor.nextPage();
-            currentPoints.push({
-              id,
-              pos: vec(
-                cursor.getColumn() * fontSize,
-                top + cursor.getLine() * fontSize,
-              ),
-            });
-            cursor.nextChar();
+      font
+        ?.getGlyphIDs(currentParagraph)
+        .forEach((id: number, index: number) => {
+          if (id === 0) {
+            return;
           }
-        } else {
-          if (cursor.getLine() < maxLines) {
-            currentPoints.push({
-              id,
-              pos: vec(
-                cursor.getColumn() * fontSize,
-                top + cursor.getLine() * fontSize,
-              ),
-            });
-            cursor.nextLine();
+          if (cursor.getColumn() < maxChar - 1) {
+            if (cursor.getLine() < maxLines) {
+              currentPoints.push({
+                id,
+                pos: vec(
+                  cursor.getColumn() * fontSize,
+                  top + cursor.getLine() * fontSize,
+                ),
+              });
+              cursor.nextChar();
+            } else {
+              currentChacpterPoints.push(currentPoints);
+              currentPoints = [];
+              cursor.nextPage();
+              currentPoints.push({
+                id,
+                pos: vec(
+                  cursor.getColumn() * fontSize,
+                  top + cursor.getLine() * fontSize,
+                ),
+              });
+              cursor.nextChar();
+            }
           } else {
-            currentChacpterPoints.push(currentPoints);
-            currentPoints = [];
-            cursor.nextPage();
-            currentPoints.push({
-              id,
-              pos: vec(
-                cursor.getColumn() * fontSize,
-                top + cursor.getLine() * fontSize,
-              ),
-            });
-            cursor.nextChar();
+            if (cursor.getLine() < maxLines) {
+              currentPoints.push({
+                id,
+                pos: vec(
+                  cursor.getColumn() * fontSize,
+                  top + cursor.getLine() * fontSize,
+                ),
+              });
+              cursor.nextLine();
+            } else {
+              currentChacpterPoints.push(currentPoints);
+              currentPoints = [];
+              cursor.nextPage();
+              currentPoints.push({
+                id,
+                pos: vec(
+                  cursor.getColumn() * fontSize,
+                  top + cursor.getLine() * fontSize,
+                ),
+              });
+              cursor.nextChar();
+            }
           }
-        }
-        if (index === currentParagraph.length - 1) {
-          if (cursor.getLine() < maxLines) {
-            cursor.nextParagraph();
-          } else {
-            cursor.nextChacpter();
-            currentChacpterPoints.push(currentPoints);
-            currentPoints = [];
+          if (index === currentParagraph.length - 1) {
+            if (cursor.getLine() < maxLines) {
+              cursor.nextParagraph();
+            } else {
+              cursor.nextChacpter();
+              currentChacpterPoints.push(currentPoints);
+              currentPoints = [];
+            }
           }
-        }
-      });
+        });
     }
     currentChacpterPoints.push(currentPoints);
     bookPoints.push({

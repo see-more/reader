@@ -24,7 +24,16 @@ export default function Index() {
     setMaxChar(Math.floor(width / config.fontSize));
     setMaxLines(Math.floor((height - top) / config.fontSize));
     setTop(top);
-  }, []);
+  }, [
+    height,
+    setMaxChar,
+    setMaxLines,
+    top,
+    width,
+    setTop,
+    config.fontSize,
+    setFontSize,
+  ]);
   return (
     <View style={styles.container}>
       {books.length ? (

@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["android.permission.READ_EXTERNAL_STORAGE"]
     },
     "newArchEnabled": true,
     "web": {
