@@ -30,7 +30,7 @@ export default function Index() {
               <Pressable
                 onPress={() =>
                   router.push({
-                    pathname: 'book/$book',
+                    pathname: 'book/[book]',
                     params: {
                       uri: item.uri,
                     },
