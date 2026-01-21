@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, GestureResponderEvent } from 'react-native';
+import { Text, View, type GestureResponderEvent } from 'react-native';
 const BookCover = ({
   height,
   width,
@@ -9,7 +9,7 @@ const BookCover = ({
   width: number;
   bookname?: string;
 }) => {
-  const touch = (e: GestureResponderEvent) => {};
+  const touch = (_e: GestureResponderEvent) => {};
   return (
     <View
       onTouchEnd={touch}

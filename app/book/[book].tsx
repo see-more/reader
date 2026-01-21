@@ -1,9 +1,4 @@
-import {
-  SafeAreaView,
-  useWindowDimensions,
-  View,
-  ActivityIndicator,
-} from 'react-native';
+import { SafeAreaView, useWindowDimensions, View, ActivityIndicator } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { Book } from '../../models/Book';
 import { useLocalSearchParams } from 'expo-router';
@@ -33,19 +28,9 @@ const BookReader = () => {
   const fontSize = 22;
   const maxLines = Math.floor((height - top) / fontSize);
   const maxChar = Math.floor(width / fontSize);
-  const font = useFont(
-    require('@/assets/fonts/FangZhengYouHeiJianTi-1.ttf'),
-    fontSize,
-  );
+  const font = useFont(require('@/assets/fonts/FangZhengYouHeiJianTi-1.ttf'), fontSize);
   const glyphs = useMemo(() => {
-    return caculateBook(
-      book!,
-      font,
-      maxChar,
-      maxLines,
-      fontSize,
-      top ? top * 2 : 30,
-    );
+    return caculateBook(book!, font, maxChar, maxLines, fontSize, top ? top * 2 : 30);
   }, [book, font, maxChar, maxLines, top]);
   return (
     <SafeAreaView
@@ -74,10 +59,7 @@ const BookReader = () => {
           ) {
             return;
           }
-          if (
-            currentPage ===
-            glyphs[currentChacpter].allchacpterPoints.length - 1
-          ) {
+          if (currentPage === glyphs[currentChacpter].allchacpterPoints.length - 1) {
             setCurrentPage(0);
             setCurrentchapter(currentChacpter + 1);
           } else {
@@ -89,16 +71,11 @@ const BookReader = () => {
       {glyphs && glyphs.length ? (
         <>
           <Canvas style={{ flex: 1 }}>
-            <Glyphs
-              font={font}
-              glyphs={glyphs[currentChacpter].allchacpterPoints[currentPage]}
-            />
+            <Glyphs font={font} glyphs={glyphs[currentChacpter].allchacpterPoints[currentPage]} />
           </Canvas>
         </>
       ) : (
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-        >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator />
         </View>
       )}

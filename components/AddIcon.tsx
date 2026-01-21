@@ -12,10 +12,8 @@ const AddIcon = () => {
       return;
     }
     if (
-      books.filter(
-        (item) =>
-          item.name === res.assets[0].name && item.size === res.assets[0].size,
-      ).length !== 0
+      books.filter((item) => item.name === res.assets[0].name && item.size === res.assets[0].size)
+        .length !== 0
     ) {
       ToastAndroid.show('书籍已存在', ToastAndroid.SHORT);
       return;
@@ -24,7 +22,7 @@ const AddIcon = () => {
   };
   return (
     <View>
-      <MaterialIcons name="add" size={30} color="black" onPress={addBookList} />
+      <MaterialIcons name='add' size={30} color='black' onPress={addBookList} />
     </View>
   );
 };

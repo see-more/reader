@@ -41,14 +41,7 @@ export const useBook = ({
   const maxLines = Math.floor((height - top) / fontSize);
   const maxChar = Math.floor(width / fontSize);
 
-  const glyphs = caculateBook(
-    book!,
-    font,
-    maxChar,
-    maxLines,
-    fontSize,
-    top ? top : 30,
-  );
+  const glyphs = caculateBook(book!, font, maxChar, maxLines, fontSize, top ? top : 30);
   return {
     glyphs,
     currentPage,

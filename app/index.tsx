@@ -1,12 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { StatusBar } from 'expo-status-bar';
-import {
-  Pressable,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-  Text,
-} from 'react-native';
+import { Pressable, StyleSheet, useWindowDimensions, View, Text } from 'react-native';
 import useBookStore from '../stores/BookStore';
 import BookCover from '../components/BookCover';
 import { router } from 'expo-router';
@@ -17,23 +11,13 @@ export default function Index() {
   const { height, width } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
   const { books } = useBookStore();
-  const { setFontSize, setMaxChar, setMaxLines, setTop, config } =
-    useBookConfigStore();
+  const { setFontSize, setMaxChar, setMaxLines, setTop, config } = useBookConfigStore();
   useEffect(() => {
     setFontSize(25);
     setMaxChar(Math.floor(width / config.fontSize));
     setMaxLines(Math.floor((height - top) / config.fontSize));
     setTop(top);
-  }, [
-    height,
-    setMaxChar,
-    setMaxLines,
-    top,
-    width,
-    setTop,
-    config.fontSize,
-    setFontSize,
-  ]);
+  }, [height, setMaxChar, setMaxLines, top, width, setTop, config.fontSize, setFontSize]);
   return (
     <View style={styles.container}>
       {books.length ? (
@@ -54,11 +38,7 @@ export default function Index() {
                 }
                 style={{ flex: 1 }}
               >
-                <BookCover
-                  height={height}
-                  width={width}
-                  bookname={item.name.split('.')[0]}
-                />
+                <BookCover height={height} width={width} bookname={item.name.split('.')[0]} />
               </Pressable>
             );
           }}
@@ -69,7 +49,7 @@ export default function Index() {
       ) : (
         <Text style={styles.emptyContainer}>这里空空如也</Text>
       )}
-      <StatusBar style="auto" />
+      <StatusBar style='auto' />
     </View>
   );
 }
