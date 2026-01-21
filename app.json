@@ -63,20 +63,6 @@
     },
     "developmentClient": {
       "silentLaunch": false
-    },
-    "packagerOpts": {
-      "config": "metro.config.js",
-      "sourceExts": [
-        "expo.ts",
-        "expo.tsx",
-        "expo.js",
-        "expo.jsx",
-        "jsx",
-        "js",
-        "json",
-        "wasm",
-        "svg"
-      ]
     }
   }
 }
