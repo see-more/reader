@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack } from 'expo-router/stack';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import SearchIcon from '../components/SearchIcon';
