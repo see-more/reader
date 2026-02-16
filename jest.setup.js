@@ -1,55 +1,24 @@
+// Mock react-native Turbomodule to avoid registry errors
+jest.mock('react-native/Libraries/TurboModule/TurboModuleRegistry', () => ({
+  getEnforcing: jest.fn(() => ({})),
+}));
+
 import '@testing-library/jest-native/extend-expect';
 
-// Mock react-native
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-  return {
-    ...RN,
-    Platform: { OS: 'ios', select: jest.fn((obj) => obj.ios || obj.default) },
-  };
-});
-
-// Mock react-native-skia
-jest.mock('@shopify/react-native-skia', () => {
-  return {
-    Skia: {
-      makeFont: jest.fn(() => ({
-        getGlyphIDs: jest.fn(() => [1, 2, 3]),
-        getTextWidth: jest.fn(() => 100),
-      })),
-    },
-    SkFont: jest.fn().mockImplementation(() => ({
-      getGlyphIDs: jest.fn().mockReturnValue([1, 2, 3]),
-      getTextWidth: jest.fn().mockReturnValue(100),
-    })),
-    vec: jest.fn((x: number, y: number) => ({ x, y })),
-    SkPoint: jest.fn(),
-    Paint: jest.fn(),
-    Style: { Fill: 'fill', Stroke: 'stroke' },
-    BlendMode: { SrcOver: 'src-over' },
-  };
-});
-
-// Mock expo-router
-jest.mock('expo-router', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    back: jest.fn(),
-    replace: jest.fn(),
-  }),
-  useLocalSearchParams: () => ({}),
-  Link: 'Link',
-  Stack: {
-    Screen: 'Screen',
-  },
+// Mock @shopify/react-native-skia
+jest.mock('@shopify/react-native-skia', () => ({
+  SkFont: jest.fn().mockImplementation(() => ({
+    getGlyphIDs: jest.fn((text: string) => {
+      // Simple mock: return glyph IDs for each character
+      return Array.from(text).map((_, i) => i + 1);
+    }),
+    getTextWidth: jest.fn(() => 100),
+  })),
+  vec: jest.fn((x: number, y: number) => ({ x, y })),
+  SkPoint: jest.fn(),
 }));
 
-// Mock zustand
-jest.mock('zustand', () => ({
-  create: jest.fn((fn) => fn()),
-}));
-
-// Mock expo-document-picker
+// Mock expo-document-picker 
 jest.mock('expo-document-picker', () => ({
   pickDocumentAsync: jest.fn(),
   types: {
@@ -63,4 +32,18 @@ jest.mock('expo-file-system', () => ({
   documentDirectory: 'file:///documents/',
   readAsStringAsync: jest.fn(),
   writeAsStringAsync: jest.fn(),
+}));
+
+// Mock expo-router
+jest.mock('expo-router', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    back: jest.fn(),
+    replace: jest.fn(),
+  }),
+  useLocalSearchParams: () => ({}),
+  Link: 'Link',
+  Stack: {
+    Screen: 'Screen',
+  },
 }));

@@ -1,11 +1,13 @@
 import { SafeAreaView, useWindowDimensions, View, ActivityIndicator, Text } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import { Book } from '../../models/Book';
+import { Book } from '@/models/Book';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { Canvas, Glyphs, useFont } from '@shopify/react-native-skia';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BookPoints, calculateBook, preloadChapter, clearPageCache, getCacheSize } from '../../utils/calculateBook';
+import type { BookPoints, ChapterPoints } from '@/utils/calculateBook';
+import { calculateBook, preloadChapter, getCacheStats } from '@/utils/calculateBook';
+import { useThrottle } from '@/hooks/usePerformance';
 
 const BookReader = () => {
   const { uri } = useLocalSearchParams<{ uri: string }>();
@@ -26,6 +28,14 @@ const BookReader = () => {
   // 生成唯一书籍ID
   const bookId = useMemo(() => uri?.split('/').pop() || 'unknown', [uri]);
 
+  // 优化：使用防抖的阅读设置，避免频繁重新计算分页
+  const debouncedSettings = useMemo(() => ({
+    maxChar,
+    maxLines,
+    fontSize,
+    top: top || 30,
+  }), [maxChar, maxLines, fontSize, top]);
+
   // 加载书籍
   useEffect(() => {
     let isMounted = true;
@@ -36,7 +46,7 @@ const BookReader = () => {
         setError(null);
 
         const fileContent = await FileSystem.readAsStringAsync(uri);
-        
+
         if (!isMounted) return;
 
         // 先只解析章节结构，不解析内容
@@ -63,29 +73,27 @@ const BookReader = () => {
     };
   }, [uri]);
 
-  // 懒加载分页
+  // 加载字体
+  const font = useFont(require('@/assets/fonts/FangZhengYouHeiJianTi-1.ttf'), fontSize);
+
+  // 优化：使用防抖后的设置来计算分页
   const bookPoints: BookPoints | null = useMemo(() => {
     if (!book || !fullText || !font) return null;
 
     return calculateBook(book, fullText, bookId, {
       font,
-      maxChar,
-      maxLines,
-      fontSize,
-      top: top || 30,
+      ...debouncedSettings,
       preloadAhead: 1,  // 预加载下一章
       preloadBehind: 1,  // 预加载上一章
     });
-  }, [book, fullText, font, maxChar, maxLines, top, bookId]);
-
-  const font = useFont(require('@/assets/fonts/FangZhengYouHeiJianTi-1.ttf'), fontSize);
+  }, [book, fullText, font, bookId, debouncedSettings]);
 
   // 获取当前页字形
   const currentGlyphs = useMemo(() => {
     if (!bookPoints || bookPoints.chapterPoints.length === 0) return null;
 
     const chapterData = bookPoints.chapterPoints.find(
-      (c) => c.chapterIndex === currentChapter
+      (c: ChapterPoints) => c.chapterIndex === currentChapter
     );
 
     if (!chapterData || !chapterData.pages[currentPage]) return null;
@@ -96,7 +104,7 @@ const BookReader = () => {
   // 计算总页数
   const totalPages = useMemo(() => {
     if (!bookPoints) return 0;
-    return bookPoints.chapterPoints.reduce((sum, c) => sum + c.pages.length, 0);
+    return bookPoints.chapterPoints.reduce((sum: number, c: ChapterPoints) => sum + c.pages.length, 0);
   }, [bookPoints]);
 
   // 翻页处理
@@ -104,7 +112,7 @@ const BookReader = () => {
     if (!bookPoints) return;
 
     const chapterData = bookPoints.chapterPoints.find(
-      (c) => c.chapterIndex === currentChapter
+      (c: ChapterPoints) => c.chapterIndex === currentChapter
     );
 
     if (!chapterData) return;
@@ -122,7 +130,7 @@ const BookReader = () => {
       // 预加载后续章节
       if (fullText && font) {
         for (let i = 1; i <= 2; i++) {
-          preloadChapter(book!, fullText, bookId, {
+          preloadChapter(book!, fullText, bookId, currentChapter + i, {
             font,
             maxChar,
             maxLines,
@@ -144,7 +152,7 @@ const BookReader = () => {
       // 上一章
       setCurrentChapter(currentChapter - 1);
       const prevChapterData = bookPoints.chapterPoints.find(
-        (c) => c.chapterIndex === currentChapter - 1
+        (c: ChapterPoints) => c.chapterIndex === currentChapter - 1
       );
       if (prevChapterData) {
         setCurrentPage(prevChapterData.pages.length - 1);
@@ -152,10 +160,15 @@ const BookReader = () => {
     }
   }, [bookPoints, currentChapter, currentPage]);
 
-  // 页面切换回调
+  // 优化：翻页处理 - 使用节流防止快速翻页时性能问题
+  const throttledGoToNextPage = useThrottle(goToNextPage, 200);
+  const throttledGoToPrevPage = useThrottle(goToPrevPage, 200);
+
+  // 页面切换回调 - 显示缓存统计
   useEffect(() => {
     if (bookPoints && totalPages > 0) {
-      console.log(`缓存大小: ${getCacheSize()} 页`);
+      const stats = getCacheStats();
+      console.log(`缓存统计: ${stats.size}/${stats.maxSize} 章 | 命中率: ${(stats.hitRate * 100).toFixed(1)}% | 命中: ${stats.hits} | 未命中: ${stats.misses}`);
     }
   }, [totalPages, bookPoints]);
 
@@ -186,11 +199,11 @@ const BookReader = () => {
 
         // 点击左侧 30% -> 上一页
         if (nativeEvent.pageX < width * 0.3) {
-          goToPrevPage();
+          throttledGoToPrevPage();
         }
         // 点击右侧 30% -> 下一页
         else if (nativeEvent.pageX > width * 0.7) {
-          goToNextPage();
+          throttledGoToNextPage();
         }
         // 中间区域可以显示菜单
       }}

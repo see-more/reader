@@ -1,5 +1,5 @@
 import { Book } from '../models/Book';
-import { SkFont, SkPoint, vec } from '@shopify/react-native-skia';
+import { SkFont, SkPoint } from '@shopify/react-native-skia';
 
 export interface BookPoints {
   chapterPoints: ChapterPoints[];
@@ -27,8 +27,14 @@ export interface CalculateOptions {
 
 // 分页缓存 - 带大小限制防止内存溢出
 const pageCache = new Map<string, PageGlyph[][]>();
-const MAX_CACHE_SIZE = 50; // 最多缓存50个章节的分页结果
+const MAX_CACHE_SIZE = 30; // 优化：减少缓存大小，只保留前后各1章
 let cacheAccessOrder: string[] = [];
+let cacheHits = 0;
+let cacheMisses = 0;
+
+// 优化：字形缓存 - 缓存常用字形避免重复计算
+const glyphCache = new Map<string, number>();
+const GLYPH_CACHE_SIZE = 1000;
 
 // 优化：缓存键包含所有影响分页的参数
 function getCacheKey(bookId: string, chapterIndex: number, maxChar: number, maxLines: number, fontSize: number, top: number): string {
@@ -50,16 +56,43 @@ function addToCache(key: string, value: PageGlyph[][]): void {
 function getFromCache(key: string): PageGlyph[][] | undefined {
   const value = pageCache.get(key);
   if (value) {
+    cacheHits++;
     // 更新访问顺序（移到最新）
     cacheAccessOrder = cacheAccessOrder.filter(k => k !== key);
     cacheAccessOrder.push(key);
+  } else {
+    cacheMisses++;
   }
   return value;
 }
 
 /**
+ * 优化：批量获取字形ID（使用 Map 缓存）
+ */
+function getGlyphOptimized(font: SkFont, char: string): number {
+  const cached = glyphCache.get(char);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const glyphId = font.getGlyphIDs(char)[0] || 0;
+
+  // LRU 缓存淘汰
+  if (glyphCache.size >= GLYPH_CACHE_SIZE) {
+    // 删除最早的条目（简单实现）
+    const firstKey = glyphCache.keys().next().value;
+    if (firstKey) {
+      glyphCache.delete(firstKey);
+    }
+  }
+
+  glyphCache.set(char, glyphId);
+  return glyphId;
+}
+
+/**
  * 计算单章分页 (懒加载核心)
- * 优化：使用更高效的字符处理方式
+ * 优化：使用缓存获取字形，批量处理
  */
 export const calculateChapter = (
   chapterContent: string[],
@@ -83,11 +116,13 @@ export const calculateChapter = (
     const trimmedParagraph = paragraph.trim();
     if (!trimmedParagraph) continue;
 
-    // 优化：批量获取字形ID
-    const glyphIds = font.getGlyphIDs(trimmedParagraph);
+    // 优化：逐字获取字形，使用缓存
+    for (let i = 0; i < trimmedParagraph.length; i++) {
+      const char = trimmedParagraph[i];
+      if (!char) continue; // 添加 undefined 检查
 
-    for (let i = 0; i < glyphIds.length; i++) {
-      const id = glyphIds[i];
+      // 使用缓存优化的字形获取
+      const id = getGlyphOptimized(font, char);
       if (id === 0) continue;
 
       // 添加字形
@@ -104,7 +139,7 @@ export const calculateChapter = (
         line++;
       }
 
-      // 换行
+      // 换页
       if (line >= maxLines) {
         pages.push(currentPage);
         currentPage = [];
@@ -112,7 +147,7 @@ export const calculateChapter = (
       }
     }
 
-    // 段落结束
+    // 段落结束换行
     if (line > 0 && line < maxLines) {
       line++;
       column = 0;
@@ -120,14 +155,16 @@ export const calculateChapter = (
 
     // 页面已满
     if (line >= maxLines) {
-      pages.push(currentPage);
-      currentPage = [];
+      if (currentPage.length > 0) {
+        pages.push(currentPage);
+        currentPage = [];
+      }
       line = 0;
       column = 0;
     }
   }
 
-  // 添加最后一页
+  // 最后一页
   if (currentPage.length > 0) {
     pages.push(currentPage);
   }
@@ -240,6 +277,7 @@ export const preloadChapter = (
 export const clearPageCache = (): void => {
   pageCache.clear();
   cacheAccessOrder = [];
+  glyphCache.clear(); // 同时清除字形缓存
 };
 
 /**
@@ -252,10 +290,27 @@ export const getCacheSize = (): number => {
 /**
  * 获取缓存统计信息（用于调试和监控）
  */
-export const getCacheStats = (): { size: number; maxSize: number; hitRate: number } => {
+export const getCacheStats = (): {
+  size: number;
+  maxSize: number;
+  hitRate: number;
+  hits: number;
+  misses: number;
+} => {
+  const total = cacheHits + cacheMisses;
   return {
     size: pageCache.size,
     maxSize: MAX_CACHE_SIZE,
-    hitRate: pageCache.size / MAX_CACHE_SIZE,
+    hitRate: total > 0 ? cacheHits / total : 0,
+    hits: cacheHits,
+    misses: cacheMisses,
   };
+};
+
+/**
+ * 重置缓存统计
+ */
+export const resetCacheStats = (): void => {
+  cacheHits = 0;
+  cacheMisses = 0;
 };

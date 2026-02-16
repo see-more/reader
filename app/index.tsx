@@ -1,6 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, StyleSheet, useWindowDimensions, View, Text } from 'react-native';
+import type { DocumentPickerAsset } from 'expo-document-picker';
 import useBookStore from '../stores/BookStore';
 import BookCover from '../components/BookCover';
 import { router } from 'expo-router';
@@ -23,9 +24,8 @@ export default function Index() {
       {books.length ? (
         <FlashList
           data={books}
-          estimatedItemSize={200}
           numColumns={3}
-          renderItem={({ item }) => {
+          renderItem={({ item }: { item: DocumentPickerAsset }) => {
             return (
               <Pressable
                 onPress={() =>
