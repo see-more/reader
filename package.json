@@ -11,7 +11,10 @@
     "lint": "expo lint",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "clean": "expo start --clear"
+    "clean": "expo start --clear",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@shopify/flash-list": "2.0.2",
@@ -37,11 +40,16 @@
     "@eslint/js": "^9.0.0",
     "@expo/ngrok": "4.1.0",
     "@react-native/eslint-config": "^0.75.4",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.10",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1"
+    "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^30.2.0",
+    "jest-expo": "^54.0.17"
   },
   "private": true,
   "packageManager": "bun@1.2.8"
