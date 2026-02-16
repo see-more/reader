@@ -1,10 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Book } from '../models/Book';
 import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { bookPoints, caculateBook } from '../utils/caculateBook';
+import { BookPoints, calculateBook } from '../utils/calculateBook';
 import { SkFont } from '@shopify/react-native-skia';
 import * as FileSystem from 'expo-file-system';
+
+const getDocumentDirectory = (): string => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (FileSystem as any).documentDirectory || '';
+};
 
 export const useBook = ({
   bookName,
@@ -13,40 +18,63 @@ export const useBook = ({
   bookName: string;
   font: SkFont | null;
 }): {
-  glyphs: Array<bookPoints>;
+  bookPoints: BookPoints | null;
   currentPage: number;
-  currentChacpter: number;
+  currentChapter: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  setCurrentchapter: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentChapter: React.Dispatch<React.SetStateAction<number>>;
 } => {
   const [book, setBook] = useState<Book | null>(null);
+  const [fullText, setFullText] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(0);
-  const [currentChacpter, setCurrentchapter] = useState(0);
+  const [currentChapter, setCurrentChapter] = useState(0);
+
   useEffect(() => {
     const readFile = async () => {
       try {
         const fileContent = await FileSystem.readAsStringAsync(
-          FileSystem.documentDirectory + bookName,
+          getDocumentDirectory() + bookName,
         );
-        setBook(new Book(fileContent));
+        const newBook = new Book(fileContent);
+        setBook(newBook);
+        setFullText(fileContent);
       } catch (err) {
         console.error(err);
       }
     };
     readFile();
-  }, []);
-  const fontSize = 25;
+  }, [bookName]);
+
   const { width, height } = useWindowDimensions();
   const { top } = useSafeAreaInsets();
+  const fontSize = 25;
   const maxLines = Math.floor((height - top) / fontSize);
   const maxChar = Math.floor(width / fontSize);
 
-  const glyphs = caculateBook(book!, font, maxChar, maxLines, fontSize, top ? top : 30);
+  // 生成唯一书籍ID
+  const bookId = useMemo(() => bookName?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown', [bookName]);
+
+  // 计算书籍分页
+  const bookPoints = useMemo(() => {
+    if (!book || !font || !fullText) {
+      return null;
+    }
+    return calculateBook(book, fullText, bookId, {
+      font,
+      maxChar,
+      maxLines,
+      fontSize,
+      top: top ? top : 30,
+      preloadAhead: 1,
+      preloadBehind: 1,
+    });
+  }, [book, font, fullText, bookId, maxChar, maxLines, fontSize, top]);
+
   return {
-    glyphs,
+    bookPoints,
     currentPage,
-    currentChacpter,
+    currentChapter,
     setCurrentPage,
-    setCurrentchapter,
+    setCurrentChapter,
   };
 };
