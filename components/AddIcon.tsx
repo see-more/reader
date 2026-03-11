@@ -11,8 +11,13 @@ const AddIcon = () => {
       ToastAndroid.show('导入中止', ToastAndroid.SHORT);
       return;
     }
+    const newBook = res.assets[0];
+    if (!newBook) {
+      ToastAndroid.show('导入失败', ToastAndroid.SHORT);
+      return;
+    }
     if (
-      books.filter((item) => item.name === res.assets[0].name && item.size === res.assets[0].size)
+      books.filter((item) => item.name === newBook.name && item.size === newBook.size)
         .length !== 0
     ) {
       ToastAndroid.show('书籍已存在', ToastAndroid.SHORT);
